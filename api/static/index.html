@@ -700,8 +700,8 @@
                         <h1>PathSnap</h1>
                     </div>
                 </div>
-                <div class="badge-live">
-                    <span class="pulse-dot"></span> Live Ready
+                <div class="badge-live" id="model-mode-badge">
+                    <span class="pulse-dot" id="model-pulse-dot"></span> <span id="model-mode-text">Real Model</span>
                 </div>
             </div>
             <p class="brand-sub">Neural GPS Map-Matching & Telemetry Engine</p>
@@ -774,6 +774,10 @@
             </div>
 
             <div class="hud-grid">
+                <div class="hud-cell" style="grid-column: span 2;">
+                    <div class="cell-k">Active Inference Engine</div>
+                    <div class="cell-v" id="hud-model-name" style="font-size:0.75rem; color:var(--cyan); word-break:break-all;">Loading…</div>
+                </div>
                 <div class="hud-cell">
                     <div class="cell-k">GPS Fixes</div>
                     <div class="cell-v" id="hud-pts">—</div>
@@ -962,6 +966,15 @@
             document.getElementById('trip-count').textContent = `${trips.length} loaded`;
             document.getElementById('btn-predict-all').disabled = false;
             toast(`Discovered ${trips.length} test trips`);
+
+            // Query health for active predictor status
+            try {
+                const hres = await fetch(`${url}/health`);
+                if (hres.ok) {
+                    const hdata = await hres.json();
+                    updateModelBadge(hdata.predictor, hdata.is_real_predictor);
+                }
+            } catch (_) {}
 
             // Auto-select first trip
             if (trips.length > 0 && !activeTripId) {
@@ -1183,6 +1196,10 @@
         document.getElementById('hud-pts').textContent = (data.track || []).length;
         document.getElementById('hud-arcs').textContent = data.n_predicted_arcs || 0;
         document.getElementById('hud-time').textContent = `${data.prediction_time_ms} ms`;
+        if (data.predictor) {
+            document.getElementById('hud-model-name').textContent = data.predictor;
+            updateModelBadge(data.predictor, data.is_real_predictor);
+        }
 
         // Calculate approximate distance along track
         let distMeters = 0;
@@ -1201,6 +1218,27 @@
         const pct = (accuracy * 100).toFixed(0);
         badge.textContent = `${pct}%`;
         badge.className = 'badge-acc show ' + (accuracy >= 0.5 ? 'high' : accuracy >= 0.25 ? 'mid' : 'low');
+    }
+
+    function updateModelBadge(name, isReal) {
+        const badge = document.getElementById('model-mode-badge');
+        const text = document.getElementById('model-mode-text');
+        const dot = document.getElementById('model-pulse-dot');
+        if (!badge || !text) return;
+
+        if (isReal) {
+            badge.style.background = 'rgba(16, 185, 129, 0.18)';
+            badge.style.borderColor = 'rgba(16, 185, 129, 0.4)';
+            badge.style.color = '#34d399';
+            if (dot) dot.style.background = '#10b981';
+            text.textContent = '⚡ REAL MODEL';
+        } else {
+            badge.style.background = 'rgba(245, 158, 11, 0.18)';
+            badge.style.borderColor = 'rgba(245, 158, 11, 0.4)';
+            badge.style.color = '#fbbf24';
+            if (dot) dot.style.background = '#f59e0b';
+            text.textContent = '⚠️ DUMMY PREDICTOR';
+        }
     }
 
     // ── Simulation Engine ───────────────────────────────────────────────

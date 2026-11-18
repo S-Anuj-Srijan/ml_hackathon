@@ -195,14 +195,15 @@ async def predict_route(trip_id: str):
 
     # Score against ground truth (server-side only; score goes to response, truth does NOT)
     accuracy = None
+    pred_tag = "⚡ [REAL MODEL]" if getattr(predictor, "is_real", False) else "⚠️ [DUMMY MODEL]"
     if trip_id in ground_truths:
         accuracy = score_trip(predicted_arc_ids, ground_truths[trip_id])
-        logger.info("[%s] trip %s  accuracy=%.4f  pred_arcs=%d  gt_arcs=%d  time=%.1fms",
-                    request_id, trip_id, accuracy,
+        logger.info("[%s] %s trip %s  accuracy=%.4f  pred_arcs=%d  gt_arcs=%d  time=%.1fms",
+                    request_id, pred_tag, trip_id, accuracy,
                     len(predicted_arc_ids), len(ground_truths[trip_id]), pred_time_ms)
     else:
-        logger.info("[%s] trip %s  (no ground truth)  pred_arcs=%d  time=%.1fms",
-                    request_id, trip_id, len(predicted_arc_ids), pred_time_ms)
+        logger.info("[%s] %s trip %s  (no ground truth)  pred_arcs=%d  time=%.1fms",
+                    request_id, pred_tag, trip_id, len(predicted_arc_ids), pred_time_ms)
 
     response = {
         "trip_id": trip_id,
@@ -212,6 +213,8 @@ async def predict_route(trip_id: str):
         "prediction_time_ms": round(pred_time_ms, 1),
         "track": meta.track_lonlat.tolist(),
         "timestamps": meta.track_time.tolist() if hasattr(meta, "track_time") else [],
+        "predictor": result.get("predictor", getattr(predictor, "name", "Unknown")),
+        "is_real_predictor": getattr(predictor, "is_real", False),
     }
 
     # Include accuracy only if ground truth exists (never include the truth itself!)
@@ -227,5 +230,6 @@ async def health():
     return {
         "status": "ok",
         "trips_loaded": len(trip_registry),
-        "predictor": type(predictor).__name__,
+        "predictor": getattr(predictor, "name", type(predictor).__name__),
+        "is_real_predictor": getattr(predictor, "is_real", False),
     }
