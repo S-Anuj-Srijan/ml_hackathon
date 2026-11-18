@@ -7,7 +7,6 @@ data/raw/
 .pytest_cache/
 Student folder/
 PathSnap_student_materials/
-src/
 *.tmp
 build-data.log
 *.bak
@@ -30,3 +29,33 @@ artifacts/experiments/*.npy
 artifacts/experiments/*.db
 artifacts/experiments/*.db-*
 .runtime/
+
+# Local credentials and environment configuration
+.env
+.env.*
+!.env.example
+!.env.sample
+.aws/
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Reproducible data products and duplicate generated maps
+artifacts/data/*.parquet
+artifacts/data/*.html
+artifacts/experiments/source_map.html
+
+# Transfer/build outputs; frontend sources remain tracked
+dist/
+build/
+output/
+PathSnap-frontend.zip
+reports/technical_report.md
+
+# Tool caches and coverage output
+.mypy_cache/
+.ruff_cache/
+.tox/
+.coverage
+htmlcov/
