@@ -1,0 +1,112 @@
+{
+  "readiness": {
+    "status": "ready",
+    "trips_loaded": 10,
+    "predictor": "ModelPredictor",
+    "model_version": "HistGB-8623248d7844"
+  },
+  "trips": [
+    {
+      "trip_id": "00000000",
+      "status": 200,
+      "points": 2503,
+      "seconds": 7.203812000000653,
+      "proxy_accuracy": 0.9488613663603676
+    },
+    {
+      "trip_id": "00000007",
+      "status": 200,
+      "points": 1354,
+      "seconds": 3.865040699999554,
+      "proxy_accuracy": 0.8892171344165436
+    },
+    {
+      "trip_id": "00000009",
+      "status": 200,
+      "points": 1049,
+      "seconds": 8.227673200000027,
+      "proxy_accuracy": 0.8560533841754051
+    },
+    {
+      "trip_id": "00000040",
+      "status": 200,
+      "points": 2995,
+      "seconds": 12.504388899999867,
+      "proxy_accuracy": 0.9108514190317195
+    },
+    {
+      "trip_id": "00000052",
+      "status": 200,
+      "points": 262,
+      "seconds": 4.108912400000008,
+      "proxy_accuracy": 0.9885496183206107
+    },
+    {
+      "trip_id": "00000056",
+      "status": 200,
+      "points": 3958,
+      "seconds": 29.693466400000034,
+      "proxy_accuracy": 0.9105608893380496
+    },
+    {
+      "trip_id": "00000065",
+      "status": 200,
+      "points": 768,
+      "seconds": 7.04193369999939,
+      "proxy_accuracy": 0.84375
+    },
+    {
+      "trip_id": "00000076",
+      "status": 200,
+      "points": 1486,
+      "seconds": 24.362868300000628,
+      "proxy_accuracy": 0.8553162853297442
+    },
+    {
+      "trip_id": "00000077",
+      "status": 200,
+      "points": 3911,
+      "seconds": 25.346602099999473,
+      "proxy_accuracy": 0.6187675786243927
+    },
+    {
+      "trip_id": "00000091",
+      "status": 200,
+      "points": 874,
+      "seconds": 6.90695659999983,
+      "proxy_accuracy": 0.8489702517162472
+    }
+  ],
+  "all_passed": true,
+  "runtime": {
+    "python": "3.13.9",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "processor": "Intel64 Family 6 Model 154 Stepping 3, GenuineIntel",
+    "logical_cpus": 16
+  },
+  "release_sha256": {
+    "requirements-lock.txt": "8e3b68b2ce037821a8d21467c27a16dc1fb8d10ebdc874d5f155eb83ecc92d98",
+    "Dockerfile": "ca0954f083f7e75acb2d55cef89d68af989805a228471ffdc6cfcaf7bb33b71e",
+    "compose.yaml": "0c8e4b5bc330817fbb25025614d151b28580b1fe760d6d925589422a4c20f94d",
+    "decoder.py": "e30b87a203ddf2d12c7356769b773356f1864408a205cb4ca7b27b06f8a8616e",
+    "data_pipeline.py": "417c570c3214fc65efe1e34cfd6f6ffff7ffc8adef8750869d0949b5470f593f",
+    "backend\\paths.py": "307e85a3b196882e8be43bb7da412023955f700511a27ca54a02710e4d4f5016",
+    "backend\\run_server.py": "9ad4feb8d1d2505f665b747760e04e6174bb935bac5c056d377398fd7db361ea",
+    "backend\\__init__.py": "28275c2045b366dadec7a785d1a305da20fd4409f81d797a21afb05e6c427be4",
+    "backend\\api\\data_loader.py": "b969b99d59bdfd0ff796c079bc28aeda97e47e17afb217330387706b1b18483b",
+    "backend\\api\\main.py": "9b3a0844acb5cba67c7c18a1369bf64d999dea259f803bb842756596ee229946",
+    "backend\\api\\predictor.py": "ea8f5de7c5ac0b5a75cb014dcc3de060b2ef431fde09f0cbe36791d650d52117",
+    "backend\\api\\scoring.py": "6a9118cded01575d7e2274aa59b6a156f36d4e5db842d19be312c3e2644fc894",
+    "backend\\api\\__init__.py": "2ca102377322eef3ee52eab79196902ebc85bfbd470d6a7a06e22ff73b0e0d70",
+    "frontend\\index.html": "8ac5bd29202fbae305b0669550a737253ce4718322aa5fb80ddcb42de2b243b4",
+    "frontend\\app.js": "b8dace40df5ff9104284a142f3e3f3d0ca9bfe6c1f1f4ac0224e10dbbd54de69",
+    "frontend\\config.js": "9cdb657fba19b18baeed607405c97d024ef597ba26b0563af8bac9d5b5d59da5",
+    "mlops\\compare_one.py": "96d35f8507b69e1cb364a695c841fe857cf7cef42786f614d53eb212867b8ae3",
+    "mlops\\evaluate.py": "e82a481a316533b9a14efb72ae86acf3b0ae80d1f92c564d751f970f1ed6b290",
+    "mlops\\report.py": "e5531fd83f36e63feb8e25b4abf009b1ff3b04bc2f78ff671d74f3640665d35f",
+    "mlops\\train.py": "37d37f611588f5c88cb87032d0fc6f9fa82d1288266d92fb663363bed752dd3e",
+    "mlops\\verify_release.py": "5e51719a74dd5b72bd5f57afd7f325e03e9b5f7e3214f68a630e80df0634a123",
+    "mlops\\__init__.py": "4bf6ad02be1b33d6888c82be428d181c4c457569c4e129faea452425461caab1"
+  },
+  "scope": "ten student-development trips via FastAPI TestClient; no physical two-laptop or Docker execution"
+}

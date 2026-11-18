@@ -11,7 +11,7 @@ plt.rcParams.update({'font.size': 12})
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.units import inch
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image, Table, TableStyle, PageBreak
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image, Table, TableStyle, PageBreak, KeepTogether
 
 ROOT=Path('artifacts/experiments')
 
@@ -23,6 +23,8 @@ def main():
     validation=json.loads(Path('reports/release_validation.json').read_text())
     summary=json.loads(Path('artifacts/data/summary.json').read_text())
     styles=getSampleStyleSheet(); styles['BodyText'].leading=14
+    styles['Heading1'].keepWithNext=True
+    styles['Heading2'].keepWithNext=True
     story=[]; md=[]
     def text(s):
         md.append(s+'\n'); story.extend([Paragraph(escape(s),styles['BodyText']),Spacer(1,7)])
@@ -40,7 +42,7 @@ def main():
         w,h=PILImage.open(path).size
         width=6.5*inch; height=width*h/w
         if height>6*inch: width*=6*inch/height; height=6*inch
-        story.extend([Image(str(path),width=width,height=height),Paragraph(escape(caption),styles['Caption'] if 'Caption' in styles else styles['BodyText']),Spacer(1,10)])
+        story.extend([KeepTogether([Image(str(path),width=width,height=height),Paragraph(escape(caption),styles['Caption'] if 'Caption' in styles else styles['BodyText'])]),Spacer(1,10)])
         md.append(f'![{caption}](../{path.as_posix()})\n')
     heading('PathSnap Technical Report')
     text('Distributed GPS map matching | Complete A-D implementation and measured student-development evaluation | 18 November 2026')
@@ -120,7 +122,7 @@ def main():
     if Path('reports/ui_screenshot.png').exists(): picture(Path('reports/ui_screenshot.png'),'Working evaluator UI on the local server.')
     if Path('reports/folium_screenshot.png').exists(): picture(Path('reports/folium_screenshot.png'),'Rendered interactive Folium map.')
     heading('7. API, UI, deployment and MLOps')
-    text('Laptop 1 hosts FastAPI, the model and graph. Laptop 2 opens /ui/ over the LAN. The UI requests /trips and POST /predict/{trip_id}; only prediction geometry, input GPS and aggregate scores are returned. Prediction and reference scoring are separate. The API reports proxy-label point accuracy and explicitly named route Jaccard. No dummy fallback remains.')
+    text('Laptop 1 hosts the backend API, model and graph. Laptop 2 opens its independent frontend/index.html and connects to Laptop 1 via the configured LAN API URL. The portable ZIP includes local map assets; no model or reference data is bundled. The UI requests /trips and POST /predict/{trip_id}; only prediction geometry, input GPS and aggregate scores are returned. Prediction and reference scoring are separate. The API reports proxy-label point accuracy and explicitly named route Jaccard. No dummy fallback remains.')
     text('The release validates model SHA-256 and feature schema before startup, fails on invalid trips or incorrect trip count, and exports data/source fingerprints, dependency versions and seed. /health, /ready and /metrics support operations. Structured JSON prediction logs record request ID, model version, latency and score. Docker mounts data/references read-only; CI runs synthetic tests without raw data. README documents installation, reproduction, environment configuration and rollback.')
     text(f"Automated API verification passed for {len(validation['trips'])} real student trips, with one predicted arc per observation and no reference arrays in responses. Scope: {validation['scope']}. GitHub publication, reserved evaluator scores and a physical two-laptop LAN test are not established by these checks.")
     table(['Trip','HTTP','Points','API seconds'],[[r['trip_id'],r['status'],r['points'],f"{r['seconds']:.2f}"] for r in validation['trips']],[140,60,110,158])
@@ -129,6 +131,8 @@ def main():
     text('Commands: python data_pipeline.py; python -m mlops.train; python -m mlops.evaluate; python -m unittest discover -s tests -v; python -m mlops.verify_release; python -m mlops.report. The README includes the complete file tree and operational runbook. All reported values can be traced to compact JSON/CSV artifacts; the model manifest identifies source hashes and dataset hash. No epoch-wise curves are claimed for the five selected algorithms.')
     text('Known limits: proxy labels, incomplete candidate coverage in training, a small student partition, fixed decoder defaults, bounded road-distance searches, and simplified straight arc geometry. This release predicts the observed segments; it does not insert unobserved connecting arcs into output geometry. No independently verified physical ground truth is available. Run the physical LAN/container checks and evaluator setup on the actual assessment machines, and publish the repository before submission.')
     Path('reports/technical_report.md').write_text('\n'.join(md),encoding='utf-8')
+    from mlops.consolidate import consolidate
+    consolidate('\n'.join(md))
     readme=Path('README.md')
     base=readme.read_text(encoding='utf-8').split('<!-- measured-results -->')[0].rstrip()
     measured=['','<!-- measured-results -->','## Measured release results','',
@@ -138,8 +142,8 @@ def main():
         measured.append(f"| {name} | {r['cv_top1_mean']:.4f} | {r['student_top1']:.4f} | {r['student_macro_f1']:.4f} | {r['student_log_loss']:.4f} |")
     measured.extend(['',f"Selected family: **{tuning['selected_model']}**. TPE trials: **{tuning['trials']}**. Tuned artifact deployed: **{tuning['deployed_tuned']}**.",
         '',f"Final classifier Top-1: **{sequence['classifier_top1']:.2%}**; classifier + HMM: **{sequence['hmm_top1']:.2%}**. Strict continuity changes from **{sequence['classifier_continuity']:.2%}** to **{sequence['hmm_continuity']:.2%}**. These are student results against route-derived proxy labels.",
-        '',f"All **{len(validation['trips'])} student trips** passed API verification. The data and system test suites passed (4 + 6 tests). Docker/physical two-laptop deployment and reserved evaluator results remain unverified.",
-        '', '[Technical report](reports/technical_report.md) | [PDF report](output/pdf/PathSnap_Technical_Report.pdf) | [Interactive route map](artifacts/experiments/route_map.html) | [Release checks](reports/release_validation.json)', ''])
+        '',f"All **{len(validation['trips'])} student trips** passed API verification. The data and system/deployment test suites passed (4 + 11 tests). Docker/physical two-laptop deployment and reserved evaluator results remain unverified.",
+        '', '[Consolidated report](REPORT.md) | [Interactive route map](artifacts/experiments/route_map.html) | [Release checks](reports/release_validation.json)', ''])
     readme.write_text(base+'\n'+'\n'.join(measured),encoding='utf-8')
     dest=Path('output/pdf'); dest.mkdir(parents=True,exist_ok=True)
     def footer(canvas,doc):
