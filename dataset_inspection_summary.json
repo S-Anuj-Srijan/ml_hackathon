@@ -1,0 +1,29 @@
+{
+  "archive": "Student folder.zip",
+  "partitions": {
+    "train": 80,
+    "student_test": 10
+  },
+  "total_trip_files": 360,
+  "files_per_trip": [
+    ".track",
+    ".nodes",
+    ".arcs",
+    ".route"
+  ],
+  "student_test_summary": {
+    "median_gps_observations": 1420.0,
+    "median_nodes": 6596.5,
+    "median_arcs": 13145.0,
+    "median_reference_route_arcs": 250.0,
+    "trips_with_nonperfect_direct_reference_route_continuity": 1,
+    "total_gps_time_gaps_over_1_second": 264,
+    "max_gps_time_gap_seconds": 210.0
+  },
+  "train_summary": {
+    "trips_with_nonperfect_direct_reference_route_continuity": 10,
+    "total_gps_time_gaps_over_1_second": 7286,
+    "max_gps_time_gap_seconds": 153064.0
+  },
+  "note": "Reference-route continuity diagnostics only; not decoder performance."
+}
