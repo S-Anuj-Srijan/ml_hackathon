@@ -49,18 +49,23 @@ class DummyPredictor(BasePredictor):
 
 
 # ── Factory ──────────────────────────────────────────────────────────
-_REAL_MODEL_PATH = Path(__file__).resolve().parent.parent / "models" / "best_model.joblib"
+_REAL_MODEL_PATHS = [
+    Path(__file__).resolve().parent.parent / "models" / "best_model.joblib",
+    Path(__file__).resolve().parent.parent / "best_model.joblib",
+]
 
 
 def get_predictor() -> BasePredictor:
     """Return the best available predictor."""
 
     # Check if a trained model from Member B exists
-    if _REAL_MODEL_PATH.exists():
+    model_path = next((p for p in _REAL_MODEL_PATHS if p.exists()), None)
+    if model_path:
         try:
             import joblib
-            model = joblib.load(_REAL_MODEL_PATH)
-            logger.info("Loaded model from %s", _REAL_MODEL_PATH)
+            loaded = joblib.load(model_path)
+            model = loaded["model"] if isinstance(loaded, dict) and "model" in loaded else loaded
+            logger.info("Loaded model from %s", model_path)
 
             # Check if Viterbi decoder from Member C is available
             try:

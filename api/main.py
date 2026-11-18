@@ -211,6 +211,7 @@ async def predict_route(trip_id: str):
         "n_predicted_arcs": len(predicted_arc_ids),
         "prediction_time_ms": round(pred_time_ms, 1),
         "track": meta.track_lonlat.tolist(),
+        "timestamps": meta.track_time.tolist() if hasattr(meta, "track_time") else [],
     }
 
     # Include accuracy only if ground truth exists (never include the truth itself!)
