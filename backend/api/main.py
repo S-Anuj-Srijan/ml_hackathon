@@ -11,11 +11,13 @@ from decoder import continuity
 from .data_loader import load_trip_data
 from .predictor import get_predictor
 from .scoring import load_ground_truth, score_trip
+from backend.paths import PROJECT_ROOT, resource_path
+from backend.model_comparison import log_model_comparison
 
 logger=logging.getLogger('pathsnap')
 logging.basicConfig(level=logging.INFO,format='%(message)s')
-DATA_DIR=Path(os.environ.get('PATHSNAP_DATA_DIR','Student folder/Student folder/student_test'))
-GROUND_TRUTH_DIR=Path(os.environ.get('PATHSNAP_TRUTH_DIR','ground_truth'))
+DATA_DIR=resource_path('PATHSNAP_DATA_DIR','Student folder/Student folder/student_test')
+GROUND_TRUTH_DIR=resource_path('PATHSNAP_TRUTH_DIR','ground_truth')
 trip_registry={}
 ground_truths={}
 predictor=None
@@ -36,13 +38,17 @@ async def lifespan(app):
     expected=int(os.environ.get('PATHSNAP_EXPECTED_TRIPS','10'))
     if len(trip_registry)!=expected: raise RuntimeError(f'Expected {expected} trips; loaded {len(trip_registry)}')
     logger.info(json.dumps({'event':'ready','trips':len(trip_registry),'model_version':predictor.version}))
+    log_model_comparison(logger, predictor.version)
     yield
     trip_registry.clear(); ground_truths.clear(); predictor=None
 
 app=FastAPI(title='PathSnap',version='1.0.0',lifespan=lifespan)
-app.add_middleware(CORSMiddleware,allow_origins=os.environ.get('PATHSNAP_CORS_ORIGINS','*').split(','),
+app.add_middleware(CORSMiddleware,allow_origins=[origin.strip() for origin in os.environ.get('PATHSNAP_CORS_ORIGINS','*').split(',') if origin.strip()],
                    allow_credentials=False,allow_methods=['GET','POST'],allow_headers=['*'])
-app.mount('/ui',StaticFiles(directory=str(Path(__file__).parent/'static'),html=True),name='ui')
+# Optional convenience for a local preview; the API runs without frontend files.
+FRONTEND_DIR=PROJECT_ROOT/'frontend'
+if (FRONTEND_DIR/'index.html').is_file():
+    app.mount('/ui',StaticFiles(directory=str(FRONTEND_DIR),html=True),name='ui')
 
 @app.get('/health')
 def health(): return {'status':'ok'}

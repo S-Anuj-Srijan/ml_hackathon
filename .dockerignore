@@ -5,7 +5,10 @@ Student folder
 PathSnap_student_materials
 ground_truth
 artifacts/data
-artifacts/experiments
+artifacts/experiments/*
+!artifacts/experiments/model_comparison.json
+!artifacts/experiments/tuning.json
+!artifacts/experiments/sequence_summary.json
 reports
 tmp
 *.log

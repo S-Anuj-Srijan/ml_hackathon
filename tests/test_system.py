@@ -5,7 +5,7 @@ import joblib, numpy as np, pandas as pd
 from sklearn.dummy import DummyClassifier
 from data_pipeline import Network, FEATURE_COLUMNS, candidate_features, project
 from decoder import ViterbiDecoder
-from api.predictor import ModelPredictor
+from backend.api.predictor import ModelPredictor
 
 class DecoderTests(unittest.TestCase):
     def setUp(self):
@@ -38,7 +38,7 @@ class ArtifactTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError,'checksum'): ModelPredictor(p)
     def test_api_prediction_truth_isolation(self):
         from fastapi.testclient import TestClient
-        import api.main as api
+        import backend.api.main as api
         with tempfile.TemporaryDirectory() as d:
             root=Path(d); trip=root/'trips'/'trip'; trip.mkdir(parents=True)
             np.savetxt(trip/'trip.track',[[8.0002,50.,1],[8.0004,50.,2]])

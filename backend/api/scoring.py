@@ -9,8 +9,9 @@ from __future__ import annotations
 import glob
 from pathlib import Path
 import numpy as np
+from backend.paths import PROJECT_ROOT
 
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = PROJECT_ROOT
 DEFAULT_GROUND_TRUTH_DIR = BASE_DIR / "ground_truth"
 
 

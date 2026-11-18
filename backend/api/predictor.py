@@ -8,6 +8,7 @@ import numpy as np
 import sklearn
 from data_pipeline import FEATURE_COLUMNS, candidate_features
 from decoder import ViterbiDecoder
+from backend.paths import resource_path
 
 class ModelPredictor:
     def __init__(self, path):
@@ -32,4 +33,4 @@ class ModelPredictor:
         return out
 
 def get_predictor():
-    return ModelPredictor(os.environ.get('PATHSNAP_MODEL', 'artifacts/model/best_model.joblib'))
+    return ModelPredictor(resource_path('PATHSNAP_MODEL', 'artifacts/model/best_model.joblib'))

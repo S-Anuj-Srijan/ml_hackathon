@@ -2,7 +2,7 @@
 import hashlib, json, os, platform, time
 from pathlib import Path
 from fastapi.testclient import TestClient
-from api.main import app, DATA_DIR
+from backend.api.main import app, DATA_DIR
 
 def main():
     expected=Path('Student folder/Student folder/student_test').resolve()
@@ -26,7 +26,7 @@ def main():
         assert client.post('/predict/not-a-trip').status_code==404
         assert client.get('/ui/').status_code==200
         files=[Path('requirements-lock.txt'),Path('Dockerfile'),Path('compose.yaml'),Path('decoder.py'),Path('data_pipeline.py')]
-        files += list(Path('api').rglob('*.py')) + list(Path('api/static').glob('*.html')) + list(Path('mlops').glob('*.py'))
+        files += list(Path('backend').rglob('*.py')) + list(Path('frontend').rglob('*.html')) + list(Path('frontend').glob('*.js')) + list(Path('mlops').glob('*.py'))
         report={'readiness':ready.json(),'trips':rows,'all_passed':True,
                 'runtime':{'python':platform.python_version(),'platform':platform.platform(),
                            'processor':platform.processor(),'logical_cpus':os.cpu_count()},

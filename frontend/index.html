@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PathSnap – Map Matching UI</title>
+    <link rel="stylesheet" href="vendor/leaflet/leaflet.css" />
+    <script src="vendor/leaflet/leaflet.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">
+            <h1>⚡ PathSnap</h1>
+            <p>GPS Map-Matching Prediction</p>
+        </div>
+
+        <form class="config-bar" id="connection-form">
+            <label for="api-url">Backend URL</label>
+            <div class="connection-row">
+                <input type="url" id="api-url" value="" placeholder="http://192.168.1.20:8000" autocomplete="url" aria-describedby="connection-help" required />
+                <button type="submit" id="btn-connect">Connect</button>
+            </div>
+            <p id="connection-help">Enter the server address from Laptop 1. Both laptops must be on the same network.</p>
+        </form>
+
+        <div class="trip-list" id="trip-list">
+            <div style="text-align:center; padding:40px 0; color: var(--text-dim);">
+                <p>Enter Laptop 1's backend URL and click Connect.</p>
+            </div>
+        </div>
+
+        <button class="btn-predict-all" id="btn-predict-all" disabled>
+            🚀 Predict All Trips
+        </button>
+
+        <div class="status-bar">
+            <span id="status"><span class="dot"></span> Not connected</span>
+            <span id="trip-count">0 trips</span>
+        </div>
+    </div>
+
+    <!-- Map -->
+    <div class="map-container">
+        <div id="map"></div>
+
+        <div class="spinner" id="spinner">
+            <div class="spinner-ring"></div>
+            <p>Running prediction…</p>
+        </div>
+
+        <div class="info-overlay" id="info-overlay">
+            <h3 id="info-title">Trip Details</h3>
+            <div class="stat"><span class="label">Trip ID</span><span class="value" id="info-trip-id">—</span></div>
+            <div class="stat"><span class="label">GPS Points</span><span class="value" id="info-points">—</span></div>
+            <div class="stat"><span class="label">Predicted Arcs</span><span class="value" id="info-arcs">—</span></div>
+            <div class="stat"><span class="label">Proxy-label accuracy</span><span class="value" id="info-accuracy">—</span></div>
+            <div class="stat"><span class="label">Pred. Time</span><span class="value" id="info-time">—</span></div>
+        </div>
+
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-dot" style="background: var(--track);"></div>
+                <span>GPS Track</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-line" style="background: var(--route);"></div>
+                <span>Predicted Route</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-dot" style="background: #55efc4; width:8px; height:8px;"></div>
+                <span>Start</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-dot" style="background: #d63031; width:8px; height:8px;"></div>
+                <span>End</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <script src="config.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

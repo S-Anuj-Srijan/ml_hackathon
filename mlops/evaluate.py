@@ -6,9 +6,9 @@ import folium
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-from api.data_loader import load_trip_data
-from api.predictor import get_predictor
-from api.scoring import score_trip
+from backend.api.data_loader import load_trip_data
+from backend.api.predictor import get_predictor
+from backend.api.scoring import score_trip
 from data_pipeline import read_file, align_route, make_map
 from decoder import continuity
 from mlops.train import save
