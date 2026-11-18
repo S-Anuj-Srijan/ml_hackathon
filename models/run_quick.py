@@ -1,9 +1,12 @@
 """First real model pass on A's features.parquet, on a SUBSET of training trips so it finishes fast.
 Usage (from models/):  python run_quick.py ../artifacts/data/features.parquet [n_train_trips=20] [n_splits=3] [models=comma,list]
 Student-test trips are always used in full. The subset size is recorded in the output: report it honestly (this is not the final run)."""
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import sys, json, time, os
 import numpy as np, pandas as pd
-from harness import zoo, group_cv, evaluate, feature_cols, seed_all, SEED
+from models.harness import zoo, group_cv, evaluate, feature_cols, seed_all, SEED
 
 path = sys.argv[1]; n_trips = int(sys.argv[2]) if len(sys.argv) > 2 else 20; n_splits = int(sys.argv[3]) if len(sys.argv) > 3 else 3
 names = sys.argv[4].split(",") if len(sys.argv) > 4 else ["LogReg", "GaussianNB", "HistGB", "RandomForest", "ExtraTrees"]

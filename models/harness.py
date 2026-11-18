@@ -25,7 +25,8 @@ DROP = [c for c in os.environ.get("PATHSNAP_DROP_FEATURES", "").split(",") if c]
 
 
 def feature_cols(df):
-    return [c for c in df.columns if c not in ID_COLS and c not in DROP]
+    from data_pipeline import FEATURE_COLUMNS
+    return [c for c in FEATURE_COLUMNS if c not in DROP]
 
 
 def obs_metrics(df, proba):
@@ -44,7 +45,8 @@ def obs_metrics(df, proba):
 def cand_metrics(y, proba):
     pred = (proba >= THRESH).astype(int)
     p = np.clip(proba, 1e-7, 1 - 1e-7)
-    return {"macro_f1": f1_score(y, pred, average="macro"),
+    return {"accuracy": float(np.mean(y == pred)), "confusion_matrix": confusion_matrix(y, pred, labels=[0, 1]).tolist(),
+            "macro_f1": f1_score(y, pred, average="macro"),
             "precision": precision_score(y, pred, average="macro", zero_division=0),
             "recall": recall_score(y, pred, average="macro", zero_division=0),
             "log_loss": log_loss(y, p, labels=[0, 1])}

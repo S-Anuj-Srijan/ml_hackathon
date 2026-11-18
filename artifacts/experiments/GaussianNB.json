@@ -1,0 +1,29 @@
+{
+  "family": "Probabilistic",
+  "config": "GaussianNB()",
+  "seed": 42,
+  "cv_macro_f1_mean": 0.6954801949781677,
+  "cv_macro_f1_std": 0.09231078070014884,
+  "cv_top1_mean": 0.5109528653925383,
+  "cv_logloss_mean": 0.2575437447997903,
+  "student_accuracy": 0.9531257356287566,
+  "student_confusion_matrix": [
+    [
+      479783,
+      10825
+    ],
+    [
+      13070,
+      6090
+    ]
+  ],
+  "student_macro_f1": 0.6566665460508734,
+  "student_precision": 0.6667582039907225,
+  "student_recall": 0.6478926140268064,
+  "student_log_loss": 0.2583275614635056,
+  "student_top1": 0.5761482254697285,
+  "student_miss_rate": 0.0,
+  "student_top1_given_hit": 0.5761482254697285,
+  "student_train_time_s": 1.2991234999999506,
+  "student_inference_ms_per_1k_cands": 0.5596002495254764
+}

@@ -384,7 +384,7 @@
             <div class="stat"><span class="label">Trip ID</span><span class="value" id="info-trip-id">—</span></div>
             <div class="stat"><span class="label">GPS Points</span><span class="value" id="info-points">—</span></div>
             <div class="stat"><span class="label">Predicted Arcs</span><span class="value" id="info-arcs">—</span></div>
-            <div class="stat"><span class="label">Accuracy</span><span class="value" id="info-accuracy">—</span></div>
+            <div class="stat"><span class="label">Proxy-label accuracy</span><span class="value" id="info-accuracy">—</span></div>
             <div class="stat"><span class="label">Pred. Time</span><span class="value" id="info-time">—</span></div>
         </div>
 
@@ -416,6 +416,8 @@
     let trips = [];
     let predictions = {};   // trip_id → prediction result
     let activeTrip = null;
+    let apiGeneration = 0;
+    let inflight = 0;
 
     // Map layers
     let map, trackLayer, routeLayer, markersLayer;
@@ -448,10 +450,11 @@
             attributionControl: false,
         }).setView([50, 10], 5);
 
-        // Dark tile layer (free OSM tiles + CSS invert for dark theme)
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-        }).addTo(map);
+        // Geometry works without remote tiles; an optional basemap is available.
+        const basemap = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19, attribution: '&copy; OpenStreetMap contributors'
+        });
+        L.control.layers({}, {'Online basemap (optional)': basemap}, {position: 'topright'}).addTo(map);
 
         // Apply dark filter to map tiles
         document.querySelector('.leaflet-tile-pane').style.filter =
@@ -468,6 +471,17 @@
 
     // ── Load trips ───────────────────────────────────────────────────
     async function loadTrips() {
+        const generation = ++apiGeneration;
+        predictions = {};
+        activeTrip = null;
+        inflight = 0;
+        showSpinner(false);
+        document.getElementById('btn-predict-all').disabled = true;
+        document.getElementById('info-overlay').classList.remove('show');
+        document.getElementById('trip-count').textContent = 'Loading trips';
+        if (trackLayer) trackLayer.clearLayers();
+        if (routeLayer) routeLayer.clearLayers();
+        if (markersLayer) markersLayer.clearLayers();
         const url = getApiUrl();
         setStatus('loading', 'Connecting…');
 
@@ -475,6 +489,7 @@
             const res = await fetch(`${url}/trips`);
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
             const data = await res.json();
+            if (generation !== apiGeneration) return;
             trips = data.trips;
             renderTripList();
             setStatus('ok', 'Connected');
@@ -482,6 +497,7 @@
             document.getElementById('btn-predict-all').disabled = false;
             toast(`Loaded ${trips.length} trips`);
         } catch (e) {
+            if (generation !== apiGeneration) return;
             setStatus('err', 'Disconnected');
             document.getElementById('trip-list').innerHTML =
                 `<div style="text-align:center; padding:40px 20px; color: var(--error);">
@@ -542,20 +558,28 @@
     // ── Predict a single trip ────────────────────────────────────────
     async function predictTrip(tripId) {
         const url = getApiUrl();
+        const generation = apiGeneration;
+        inflight++;
         showSpinner(true);
 
         try {
             const res = await fetch(`${url}/predict/${tripId}`, { method: 'POST' });
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
             const data = await res.json();
+            if (generation !== apiGeneration) return false;
             predictions[tripId] = data;
-            showPrediction(tripId, data);
+            if (activeTrip === tripId) showPrediction(tripId, data);
             updateBadge(tripId, data.accuracy);
             toast(`Trip #${tripId} – accuracy: ${data.accuracy !== null && data.accuracy !== undefined ? (data.accuracy * 100).toFixed(1) + '%' : 'N/A'}`);
+            return true;
         } catch (e) {
             toast(`Prediction failed for trip #${tripId}`, true);
+            return false;
         } finally {
-            showSpinner(false);
+            if (generation === apiGeneration) {
+                inflight--;
+                showSpinner(inflight > 0);
+            }
         }
     }
 
@@ -565,8 +589,13 @@
         btn.disabled = true;
         btn.textContent = '⏳ Predicting…';
 
+        const generation = apiGeneration;
+        let succeeded = 0;
         for (const trip of trips) {
-            await predictTrip(trip.trip_id);
+            if (generation !== apiGeneration) return;
+            activeTrip = trip.trip_id;
+            document.querySelectorAll('.trip-card').forEach(c => c.classList.toggle('active', c.dataset.tripId === trip.trip_id));
+            if (await predictTrip(trip.trip_id)) succeeded++;
             // Brief pause for visual feedback
             await new Promise(r => setTimeout(r, 200));
         }
@@ -583,7 +612,7 @@
             .map(p => p.accuracy);
         if (accs.length > 0) {
             const avg = (accs.reduce((a, b) => a + b, 0) / accs.length * 100).toFixed(1);
-            toast(`All done! Average accuracy: ${avg}%`);
+            toast(`${succeeded}/${trips.length} succeeded. Mean trip accuracy: ${avg}%`);
         }
     }
 

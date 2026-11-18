@@ -6,11 +6,14 @@ Writes:
   results/probs_train_oof.parquet   out-of-fold probability per candidate on training trips (for C to tune the decoder honestly)
   results/probs_student.parquet     probability per candidate on the 10 student trips, from the model fitted on all training trips
   results/export_info.json          what was used, so the report can state it"""
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import sys, json, time, os
 import numpy as np, pandas as pd, joblib
 from sklearn.ensemble import HistGradientBoostingClassifier
 from sklearn.model_selection import GroupKFold
-from harness import feature_cols, obs_metrics, SEED, THRESH
+from models.harness import feature_cols, obs_metrics, SEED, THRESH
 
 path, summ = sys.argv[1], sys.argv[2]
 params = json.load(open(summ))["best_params"]; df = pd.read_parquet(path); feats = feature_cols(df)

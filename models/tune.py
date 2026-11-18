@@ -1,7 +1,10 @@
 """Bayesian (TPE) hyperparameter search with group-aware CV on the 80 training trips only."""
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import json, time, optuna, pandas as pd
 from sklearn.ensemble import HistGradientBoostingClassifier
-from harness import group_cv, evaluate, feature_cols, SEED
+from models.harness import group_cv, evaluate, feature_cols, SEED
 
 def make(params):
     return HistGradientBoostingClassifier(random_state=SEED, **params)

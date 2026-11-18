@@ -1,0 +1,29 @@
+{
+  "family": "Ensemble",
+  "config": "ExtraTreesClassifier(max_depth=16, min_samples_leaf=20, n_estimators=40,\n                     n_jobs=4, random_state=42)",
+  "seed": 42,
+  "cv_macro_f1_mean": 0.8631808270761702,
+  "cv_macro_f1_std": 0.021689958830602027,
+  "cv_top1_mean": 0.7007814282424084,
+  "cv_logloss_mean": 0.05952295900069698,
+  "student_accuracy": 0.9854639757693696,
+  "student_confusion_matrix": [
+    [
+      487812,
+      2796
+    ],
+    [
+      4614,
+      14546
+    ]
+  ],
+  "student_macro_f1": 0.8947297684970752,
+  "student_precision": 0.9147014927221928,
+  "student_recall": 0.8767433763921715,
+  "student_log_loss": 0.04133374048180369,
+  "student_top1": 0.8095511482254697,
+  "student_miss_rate": 0.0,
+  "student_top1_given_hit": 0.8095511482254697,
+  "student_train_time_s": 93.83274900000015,
+  "student_inference_ms_per_1k_cands": 3.021161391064494
+}

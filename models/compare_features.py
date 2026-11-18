@@ -1,9 +1,12 @@
 """Does dropping features hurt? Compares ALL features vs a REDUCED set (HistGB, group CV on train trips + student test).
 Usage (from models/): python compare_features.py ../artifacts/data/features.parquet 20 offset_m,from_degree,to_degree"""
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import sys, time
 import numpy as np, pandas as pd
 from sklearn.ensemble import HistGradientBoostingClassifier
-from harness import feature_cols, group_cv, evaluate, SEED
+from models.harness import feature_cols, group_cv, evaluate, SEED
 
 path, n_trips, drop = sys.argv[1], int(sys.argv[2]), sys.argv[3].split(",")
 df = pd.read_parquet(path); allf = feature_cols(df); assert all(d in allf for d in drop), f"unknown feature in {drop}; have {allf}"

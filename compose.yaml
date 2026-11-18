@@ -1,0 +1,12 @@
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - "./Student folder/Student folder/student_test:/data:ro"
+      - "./ground_truth:/truth:ro"
+    environment:
+      PATHSNAP_EXPECTED_TRIPS: "10"
+      PATHSNAP_CORS_ORIGINS: "*"
+    restart: unless-stopped

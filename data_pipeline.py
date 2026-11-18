@@ -1,7 +1,7 @@
 """Part A: reproducible inventory, route-derived labels, and GPS-only candidates.
 
 Run: python data_pipeline.py --data-root "Student folder/Student folder"
-Only train and student_test are read. See data_quality_notes.md for assumptions.
+Only train and student_test are read. See A_PHASE1_README.md for methods and handoff.
 """
 from pathlib import Path
 import argparse

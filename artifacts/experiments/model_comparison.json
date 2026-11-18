@@ -1,0 +1,147 @@
+{
+  "LogReg": {
+    "family": "Linear",
+    "config": "Pipeline(steps=[('standardscaler', StandardScaler()),\n                ('logisticregression',\n                 LogisticRegression(max_iter=300, random_state=42))])",
+    "seed": 42,
+    "cv_macro_f1_mean": 0.7334089678454961,
+    "cv_macro_f1_std": 0.07443394822652716,
+    "cv_top1_mean": 0.6707690856274825,
+    "cv_logloss_mean": 0.09187420736014673,
+    "student_accuracy": 0.977960562451939,
+    "student_confusion_matrix": [
+      [
+        489292,
+        1316
+      ],
+      [
+        9919,
+        9241
+      ]
+    ],
+    "student_macro_f1": 0.8052915066618103,
+    "student_precision": 0.9277370101121208,
+    "student_recall": 0.7398122517076846,
+    "student_log_loss": 0.06090316407708848,
+    "student_top1": 0.7989039665970773,
+    "student_miss_rate": 0.0,
+    "student_top1_given_hit": 0.7989039665970773,
+    "student_train_time_s": 10.348616700000093,
+    "student_inference_ms_per_1k_cands": 0.18913839236665186
+  },
+  "GaussianNB": {
+    "family": "Probabilistic",
+    "config": "GaussianNB()",
+    "seed": 42,
+    "cv_macro_f1_mean": 0.6954801949781677,
+    "cv_macro_f1_std": 0.09231078070014884,
+    "cv_top1_mean": 0.5109528653925383,
+    "cv_logloss_mean": 0.2575437447997903,
+    "student_accuracy": 0.9531257356287566,
+    "student_confusion_matrix": [
+      [
+        479783,
+        10825
+      ],
+      [
+        13070,
+        6090
+      ]
+    ],
+    "student_macro_f1": 0.6566665460508734,
+    "student_precision": 0.6667582039907225,
+    "student_recall": 0.6478926140268064,
+    "student_log_loss": 0.2583275614635056,
+    "student_top1": 0.5761482254697285,
+    "student_miss_rate": 0.0,
+    "student_top1_given_hit": 0.5761482254697285,
+    "student_train_time_s": 1.2991234999999506,
+    "student_inference_ms_per_1k_cands": 0.5596002495254764
+  },
+  "DecisionTree": {
+    "family": "Tree",
+    "config": "DecisionTreeClassifier(max_depth=12, min_samples_leaf=30, random_state=42)",
+    "seed": 42,
+    "cv_macro_f1_mean": 0.8597919388794469,
+    "cv_macro_f1_std": 0.028541074154205318,
+    "cv_top1_mean": 0.7005144833219076,
+    "cv_logloss_mean": 0.06916818255757544,
+    "student_accuracy": 0.9854188572056308,
+    "student_confusion_matrix": [
+      [
+        486929,
+        3679
+      ],
+      [
+        3754,
+        15406
+      ]
+    ],
+    "student_macro_f1": 0.8990365408740932,
+    "student_precision": 0.8997901244955429,
+    "student_recall": 0.8982860613258402,
+    "student_log_loss": 0.03848858804802388,
+    "student_top1": 0.8138308977035491,
+    "student_miss_rate": 0.0,
+    "student_top1_given_hit": 0.8138308977035491,
+    "student_train_time_s": 161.8941402999999,
+    "student_inference_ms_per_1k_cands": 0.1865597683650767
+  },
+  "ExtraTrees": {
+    "family": "Ensemble",
+    "config": "ExtraTreesClassifier(max_depth=16, min_samples_leaf=20, n_estimators=40,\n                     n_jobs=4, random_state=42)",
+    "seed": 42,
+    "cv_macro_f1_mean": 0.8631808270761702,
+    "cv_macro_f1_std": 0.021689958830602027,
+    "cv_top1_mean": 0.7007814282424084,
+    "cv_logloss_mean": 0.05952295900069698,
+    "student_accuracy": 0.9854639757693696,
+    "student_confusion_matrix": [
+      [
+        487812,
+        2796
+      ],
+      [
+        4614,
+        14546
+      ]
+    ],
+    "student_macro_f1": 0.8947297684970752,
+    "student_precision": 0.9147014927221928,
+    "student_recall": 0.8767433763921715,
+    "student_log_loss": 0.04133374048180369,
+    "student_top1": 0.8095511482254697,
+    "student_miss_rate": 0.0,
+    "student_top1_given_hit": 0.8095511482254697,
+    "student_train_time_s": 93.83274900000015,
+    "student_inference_ms_per_1k_cands": 3.021161391064494
+  },
+  "HistGB": {
+    "family": "Boosting",
+    "config": "HistGradientBoostingClassifier(early_stopping=False, max_leaf_nodes=15,\n                               random_state=42)",
+    "seed": 42,
+    "cv_macro_f1_mean": 0.8603930100782294,
+    "cv_macro_f1_std": 0.028746258539826354,
+    "cv_top1_mean": 0.7015459686705223,
+    "cv_logloss_mean": 0.06356269966163086,
+    "student_accuracy": 0.9837180835203465,
+    "student_confusion_matrix": [
+      [
+        486443,
+        4165
+      ],
+      [
+        4135,
+        15025
+      ]
+    ],
+    "student_macro_f1": 0.887556604693427,
+    "student_precision": 0.8872655210035862,
+    "student_recall": 0.8878481688130043,
+    "student_log_loss": 0.05916629383246441,
+    "student_top1": 0.7833507306889352,
+    "student_miss_rate": 0.0,
+    "student_top1_given_hit": 0.7833507306889352,
+    "student_train_time_s": 62.86724689999983,
+    "student_inference_ms_per_1k_cands": 5.2126779240758125
+  }
+}

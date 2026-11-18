@@ -1,0 +1,29 @@
+{
+  "family": "Boosting",
+  "config": "HistGradientBoostingClassifier(early_stopping=False, max_leaf_nodes=15,\n                               random_state=42)",
+  "seed": 42,
+  "cv_macro_f1_mean": 0.8603930100782294,
+  "cv_macro_f1_std": 0.028746258539826354,
+  "cv_top1_mean": 0.7015459686705223,
+  "cv_logloss_mean": 0.06356269966163086,
+  "student_accuracy": 0.9837180835203465,
+  "student_confusion_matrix": [
+    [
+      486443,
+      4165
+    ],
+    [
+      4135,
+      15025
+    ]
+  ],
+  "student_macro_f1": 0.887556604693427,
+  "student_precision": 0.8872655210035862,
+  "student_recall": 0.8878481688130043,
+  "student_log_loss": 0.05916629383246441,
+  "student_top1": 0.7833507306889352,
+  "student_miss_rate": 0.0,
+  "student_top1_given_hit": 0.7833507306889352,
+  "student_train_time_s": 62.86724689999983,
+  "student_inference_ms_per_1k_cands": 5.2126779240758125
+}

@@ -1,0 +1,29 @@
+{
+  "family": "Tree",
+  "config": "DecisionTreeClassifier(max_depth=12, min_samples_leaf=30, random_state=42)",
+  "seed": 42,
+  "cv_macro_f1_mean": 0.8597919388794469,
+  "cv_macro_f1_std": 0.028541074154205318,
+  "cv_top1_mean": 0.7005144833219076,
+  "cv_logloss_mean": 0.06916818255757544,
+  "student_accuracy": 0.9854188572056308,
+  "student_confusion_matrix": [
+    [
+      486929,
+      3679
+    ],
+    [
+      3754,
+      15406
+    ]
+  ],
+  "student_macro_f1": 0.8990365408740932,
+  "student_precision": 0.8997901244955429,
+  "student_recall": 0.8982860613258402,
+  "student_log_loss": 0.03848858804802388,
+  "student_top1": 0.8138308977035491,
+  "student_miss_rate": 0.0,
+  "student_top1_given_hit": 0.8138308977035491,
+  "student_train_time_s": 161.8941402999999,
+  "student_inference_ms_per_1k_cands": 0.1865597683650767
+}

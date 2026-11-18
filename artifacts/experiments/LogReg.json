@@ -1,0 +1,29 @@
+{
+  "family": "Linear",
+  "config": "Pipeline(steps=[('standardscaler', StandardScaler()),\n                ('logisticregression',\n                 LogisticRegression(max_iter=300, random_state=42))])",
+  "seed": 42,
+  "cv_macro_f1_mean": 0.7334089678454961,
+  "cv_macro_f1_std": 0.07443394822652716,
+  "cv_top1_mean": 0.6707690856274825,
+  "cv_logloss_mean": 0.09187420736014673,
+  "student_accuracy": 0.977960562451939,
+  "student_confusion_matrix": [
+    [
+      489292,
+      1316
+    ],
+    [
+      9919,
+      9241
+    ]
+  ],
+  "student_macro_f1": 0.8052915066618103,
+  "student_precision": 0.9277370101121208,
+  "student_recall": 0.7398122517076846,
+  "student_log_loss": 0.06090316407708848,
+  "student_top1": 0.7989039665970773,
+  "student_miss_rate": 0.0,
+  "student_top1_given_hit": 0.7989039665970773,
+  "student_train_time_s": 10.348616700000093,
+  "student_inference_ms_per_1k_cands": 0.18913839236665186
+}

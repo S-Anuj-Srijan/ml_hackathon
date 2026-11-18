@@ -1,13 +1,16 @@
 """Feature selection evidence on TRAINING trips only (never student/evaluator data), group-aware by trip.
 Produces: correlation heatmap, permutation importance (held-out folds), drop-one-feature ablation.
 Usage (from models/): python feature_selection.py ../artifacts/data/features.parquet [n_train_trips=20] [n_splits=3]"""
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import sys, os
 import numpy as np, pandas as pd
 import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
 from sklearn.ensemble import HistGradientBoostingClassifier
 from sklearn.model_selection import GroupKFold
 from sklearn.metrics import log_loss
-from harness import feature_cols, obs_metrics, SEED
+from models.harness import feature_cols, obs_metrics, SEED
 
 path = sys.argv[1]; n_trips = int(sys.argv[2]) if len(sys.argv) > 2 else 20; n_splits = int(sys.argv[3]) if len(sys.argv) > 3 else 3
 df = pd.read_parquet(path); df = df[df.split == "train"]; feats = feature_cols(df)

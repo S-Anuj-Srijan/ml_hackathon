@@ -18,7 +18,7 @@ def _save(fig, out, name):
 def plot_cv_f1(res, out):
     names = list(res); m = [res[n]["cv_macro_f1_mean"] for n in names]; s = [res[n]["cv_macro_f1_std"] for n in names]
     fig, ax = plt.subplots(figsize=(8, 4))
-    ax.bar(names, m, yerr=s, capsize=4); ax.set_ylabel("CV macro F1 (mean ± std, 5 group folds)")
+    ax.bar(names, m, yerr=s, capsize=4); ax.set_ylabel("CV macro F1 (mean +/- std, grouped folds)")
     ax.set_title("Cross-validation macro F1 by model"); plt.setp(ax.get_xticklabels(), rotation=30, ha="right")
     _save(fig, out, "cv_macro_f1")
 
@@ -28,7 +28,7 @@ def plot_student(res, out):
     fig, ax = plt.subplots(figsize=(8, 4))
     ax.bar(x - w/2, [res[n]["student_top1"] for n in names], w, label="Top-1 accuracy")
     ax.bar(x + w/2, [res[n]["student_macro_f1"] for n in names], w, label="Macro F1")
-    ax.set_xticks(x); ax.set_xticklabels(names, rotation=30, ha="right"); ax.legend()
+    ax.set_xticks(x); ax.set_xticklabels(names, rotation=30, ha="right"); ax.legend(loc="upper left", bbox_to_anchor=(1.01, 1))
     ax.set_title("Student-test performance (10 trips)"); _save(fig, out, "student_top1_f1")
 
 
@@ -46,7 +46,7 @@ def plot_cv_vs_student(res, out):
     fig, ax = plt.subplots(figsize=(8, 4))
     ax.bar(x - w/2, [res[n]["cv_macro_f1_mean"] for n in names], w, label="CV macro F1")
     ax.bar(x + w/2, [res[n]["student_macro_f1"] for n in names], w, label="Student macro F1")
-    ax.set_xticks(x); ax.set_xticklabels(names, rotation=30, ha="right"); ax.legend()
+    ax.set_xticks(x); ax.set_xticklabels(names, rotation=30, ha="right"); ax.legend(loc="upper left", bbox_to_anchor=(1.01, 1))
     ax.set_title("CV vs student macro F1"); _save(fig, out, "cv_vs_student")
 
 

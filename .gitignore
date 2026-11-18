@@ -24,3 +24,9 @@ Thumbs.db
 
 # Results
 results/
+*.log
+tmp/
+artifacts/experiments/*.npy
+artifacts/experiments/*.db
+artifacts/experiments/*.db-*
+.runtime/
