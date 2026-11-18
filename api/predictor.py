@@ -1,106 +1,153 @@
-"""Predictor module – the plug-in point for Members B and C.
+"""Predictor module – supports Real ML Model (Member B) and Dummy heuristic.
 
-DummyPredictor queries the pre-built spatial index (cKDTree over arc midpoints)
-computed once at startup, returning sub-millisecond nearest-arc predictions
-so the full API ↔ UI pipeline works end-to-end with high performance.
-
-When Member B delivers `best_model.joblib` and Member C delivers the `decoder` module,
-`get_predictor()` seamlessly loads and runs the full ML + Viterbi pipeline.
+Features:
+- Loads models/best_model.joblib: {"model", "features", "params", "seed", "threshold"}
+- Constructs feature columns in the EXACT order specified by `features` (6 features)
+- Uses per-trip UTM zone derived dynamically from coordinates
+- Clear distinction between Real Predictor and Dummy Predictor in logs and UI
 """
 from __future__ import annotations
 
 import logging
 from abc import ABC, abstractmethod
 from pathlib import Path
+from typing import Any
 
 import numpy as np
+import pandas as pd
 
 logger = logging.getLogger("pathsnap")
+
+try:
+    from data_pipeline import candidate_features
+except ImportError:
+    candidate_features = None
 
 
 class BasePredictor(ABC):
     """Interface that every predictor must satisfy."""
+    name: str = "BasePredictor"
+    is_real: bool = False
 
     @abstractmethod
     def predict(self, trip_meta) -> dict:
-        """Return {"predicted_arcs": list[int], ...}."""
+        """Return {"predicted_arcs": list[int], "predictor": str, ...}."""
         ...
 
 
 class DummyPredictor(BasePredictor):
-    """Fast spatial-index nearest-arc heuristic.
-
-    Uses the pre-built cKDTree on UTM coordinates loaded at startup.
-    Executes in < 2ms without recomputing midpoints or graph distances.
-    """
+    """Fast nearest-arc spatial heuristic using cKDTree in per-trip UTM coordinates."""
+    name = "DummyPredictor (Nearest Arc Heuristic)"
+    is_real = False
 
     def predict(self, meta) -> dict:
-        # Spatial query using precomputed cKDTree in UTM coordinates
         _, nearest_indices = meta.spatial_index.query(meta.track_xy)
 
-        # De-duplicate consecutive arcs
         deduped = [int(nearest_indices[0])]
         for a in nearest_indices[1:]:
             a_int = int(a)
             if a_int != deduped[-1]:
                 deduped.append(a_int)
 
-        return {"predicted_arcs": deduped}
+        return {
+            "predicted_arcs": deduped,
+            "predictor": self.name,
+            "is_real": False,
+        }
 
 
-# ── Factory ──────────────────────────────────────────────────────────
-_REAL_MODEL_PATHS = [
+class RealMLPredictor(BasePredictor):
+    """Trained ML Model (HistGradientBoosting / Member B).
+
+    Generates candidates via STRtree, computes the exact 6 features,
+    and ranks candidates per GPS fix using class probability.
+    """
+    is_real = True
+
+    def __init__(self, model: Any, features: list[str], threshold: float = 0.5):
+        self.model = model
+        self.features = features
+        self.threshold = threshold
+        clf_name = type(model).__name__
+        self.name = f"RealModel ({clf_name} - {len(features)} feats)"
+
+    def predict(self, meta) -> dict:
+        if meta.network is None or candidate_features is None:
+            logger.warning("Network or candidate_features unavailable; falling back to spatial index")
+            return DummyPredictor().predict(meta)
+
+        # Generate candidates using per-trip network
+        cands, _ = candidate_features(meta.network, meta.track_raw)
+
+        if len(cands) == 0:
+            logger.warning("No candidates generated; falling back to nearest arc")
+            return DummyPredictor().predict(meta)
+
+        # Extract features in the EXACT order defined in the trained model
+        X = cands[self.features]
+
+        # Predict probability for each candidate
+        if hasattr(self.model, "predict_proba"):
+            cands["p"] = self.model.predict_proba(X)[:, 1]
+        else:
+            cands["p"] = self.model.predict(X)
+
+        # Pick top-1 candidate per observation
+        best = cands.loc[cands.groupby("obs_id")["p"].idxmax()]
+        raw_arcs = best["arc_id"].tolist()
+
+        if len(raw_arcs) == 0:
+            return DummyPredictor().predict(meta)
+
+        # Deduplicate consecutive repeat arcs
+        deduped = [int(raw_arcs[0])]
+        for a in raw_arcs[1:]:
+            a_int = int(a)
+            if a_int != deduped[-1]:
+                deduped.append(a_int)
+
+        return {
+            "predicted_arcs": deduped,
+            "predictor": self.name,
+            "is_real": True,
+            "n_candidates": len(cands),
+        }
+
+
+# ── Model Factory ────────────────────────────────────────────────────
+_MODEL_PATHS = [
     Path(__file__).resolve().parent.parent / "models" / "best_model.joblib",
     Path(__file__).resolve().parent.parent / "best_model.joblib",
 ]
 
 
 def get_predictor() -> BasePredictor:
-    """Return the best available predictor."""
-
-    # Check if a trained model from Member B exists
-    model_path = next((p for p in _REAL_MODEL_PATHS if p.exists()), None)
+    """Return RealMLPredictor if best_model.joblib exists, else DummyPredictor."""
+    model_path = next((p for p in _MODEL_PATHS if p.exists()), None)
     if model_path:
         try:
             import joblib
             loaded = joblib.load(model_path)
-            model = loaded["model"] if isinstance(loaded, dict) and "model" in loaded else loaded
-            logger.info("Loaded model from %s", model_path)
-
-            # Check if Viterbi decoder from Member C is available
-            try:
-                from ..decoder import ViterbiDecoder  # Member C's module
-                logger.info("Viterbi decoder available — using full pipeline")
-                return _RealPredictor(model, ViterbiDecoder())
-            except ImportError:
-                logger.warning("Viterbi decoder not found — using model predictor")
-                return _ModelOnlyPredictor(model)
+            if isinstance(loaded, dict) and "model" in loaded:
+                model = loaded["model"]
+                features = loaded.get("features", [
+                    "distance_m", "offset_fraction", "heading_difference_rad",
+                    "speed_mps", "arc_length_m", "distance_rank"
+                ])
+                threshold = loaded.get("threshold", 0.5)
+                logger.info("✓ Loaded real model from %s (%d features: %s)",
+                            model_path.name, len(features), features)
+                return RealMLPredictor(model, features, threshold)
+            else:
+                # Bare model object
+                logger.info("✓ Loaded model object from %s", model_path.name)
+                features = [
+                    "distance_m", "offset_fraction", "heading_difference_rad",
+                    "speed_mps", "arc_length_m", "distance_rank"
+                ]
+                return RealMLPredictor(loaded, features)
         except Exception as e:
-            logger.warning("Failed to load real model: %s — falling back to dummy", e)
+            logger.error("Failed to load model from %s: %s — falling back to DummyPredictor", model_path, e)
 
-    logger.info("No trained model found — using high-performance DummyPredictor (cKDTree)")
+    logger.info("ℹ No best_model.joblib found — running DummyPredictor (nearest arc)")
     return DummyPredictor()
-
-
-class _ModelOnlyPredictor(BasePredictor):
-    """Uses B's model for scoring candidates."""
-
-    def __init__(self, model):
-        self.model = model
-
-    def predict(self, meta) -> dict:
-        logger.warning("ModelOnlyPredictor falling back to spatial index")
-        return DummyPredictor().predict(meta)
-
-
-class _RealPredictor(BasePredictor):
-    """Full pipeline: B's ML model probabilities + C's Viterbi decoder."""
-
-    def __init__(self, model, decoder):
-        self.model = model
-        self.decoder = decoder
-
-    def predict(self, meta) -> dict:
-        logger.info("Running full ML + Viterbi pipeline for trip %s", meta.trip_id)
-        # Interface ready for B + C
-        return DummyPredictor().predict(meta)

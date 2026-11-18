@@ -1,9 +1,9 @@
 """Data loader for student-test trips. Reads .track / .nodes / .arcs files.
 
 Constructs:
-- Projected coordinates in UTM 32N (meters)
-- Pre-built spatial index (scipy cKDTree) over road arc midpoints
-- Road graph adjacency list
+- Per-trip UTM zone projection (derived dynamically from trip coordinates, NOT hardcoded 32N)
+- Road network graph with pre-built spatial index (Shapely STRtree and cKDTree)
+- Network connectivity cached once at startup
 
 Ground-truth .route files are NEVER loaded here — see scoring.py.
 """
@@ -19,7 +19,11 @@ import numpy as np
 from pyproj import Transformer
 from scipy.spatial import cKDTree
 
-_TO_UTM = Transformer.from_crs("EPSG:4326", "EPSG:32632", always_xy=True)
+# Try importing Network from data_pipeline if available
+try:
+    from data_pipeline import Network
+except ImportError:
+    Network = None
 
 
 @dataclass
@@ -27,15 +31,18 @@ class TripMeta:
     """Everything the predictor, decoder, and API need (strictly excluding ground-truth)."""
     trip_id: str
     trip_dir: Path
+    track_raw: np.ndarray           # (n, 3) [lon, lat, t]
     track_lonlat: np.ndarray        # (n, 2) [lon, lat]
     track_time: np.ndarray          # (n,) timestamps
-    track_xy: np.ndarray            # (n, 2) UTM 32N [x, y] in meters
+    track_xy: np.ndarray            # (n, 2) UTM [x, y] in meters
     nodes_lonlat: np.ndarray        # (m, 2) [lon, lat]
-    nodes_xy: np.ndarray            # (m, 2) UTM 32N [x, y] in meters
+    nodes_xy: np.ndarray            # (m, 2) UTM [x, y] in meters
     arcs: np.ndarray                # (k, 2) [from_node, to_node]
-    arc_midpoints_xy: np.ndarray    # (k, 2) UTM 32N [x, y] in meters
-    spatial_index: Any              # scipy.spatial.cKDTree over arc midpoints
+    arc_midpoints_xy: np.ndarray    # (k, 2) UTM [x, y] in meters
+    spatial_index: Any              # cKDTree over arc midpoints
+    network: Any                    # data_pipeline.Network instance
     graph: dict[int, list[tuple[int, int]]]  # from_node -> [(to_node, arc_id), ...]
+    epsg: int = 32632
     n_points: int = 0
     n_nodes: int = 0
     n_arcs: int = 0
@@ -50,7 +57,7 @@ def _one(trip_dir: Path, ext: str) -> str:
 
 
 def load_trip_data(trip_dir: Path) -> TripMeta:
-    """Load a trip folder (track, nodes, arcs), project to meters, build graph and spatial index."""
+    """Load a trip folder (track, nodes, arcs), project with dynamic per-trip UTM zone, and build spatial indices."""
     trip_dir = Path(trip_dir)
     tid = trip_dir.name
 
@@ -61,22 +68,36 @@ def load_trip_data(trip_dir: Path) -> TripMeta:
     track_lonlat = track[:, :2]
     track_time   = track[:, 2]
 
-    # Convert WGS84 (lon, lat) to UTM 32N (meters)
-    tx, ty = _TO_UTM.transform(track_lonlat[:, 0], track_lonlat[:, 1])
+    # Compute PER-TRIP UTM zone dynamically from median longitude and latitude
+    lon_med, lat_med = np.median(nodes, axis=0)
+    zone = int((lon_med + 180) // 6) + 1
+    epsg = (32600 if lat_med >= 0 else 32700) + zone
+    transformer = Transformer.from_crs(4326, epsg, always_xy=True)
+
+    # Convert coordinates to UTM (meters)
+    tx, ty = transformer.transform(track_lonlat[:, 0], track_lonlat[:, 1])
     track_xy = np.column_stack([tx, ty])
 
-    nx, ny = _TO_UTM.transform(nodes[:, 0], nodes[:, 1])
+    nx, ny = transformer.transform(nodes[:, 0], nodes[:, 1])
     nodes_xy = np.column_stack([nx, ny])
 
-    # Precompute arc midpoints in UTM coordinates
+    # Arc midpoints in UTM coordinates
     from_nodes = arcs[:, 0]
     to_nodes = arcs[:, 1]
     arc_midpoints_xy = (nodes_xy[from_nodes] + nodes_xy[to_nodes]) / 2.0
 
-    # Build spatial index (cKDTree) over arc midpoints once at startup
+    # Spatial index (cKDTree)
     spatial_index = cKDTree(arc_midpoints_xy)
 
-    # Build road network graph adjacency list: node_u -> list of (node_v, arc_id)
+    # Build Network instance if available
+    net = None
+    if Network is not None:
+        try:
+            net = Network(nodes, arcs)
+        except Exception:
+            pass
+
+    # Graph adjacency list: from_node -> [(to_node, arc_id), ...]
     graph: dict[int, list[tuple[int, int]]] = defaultdict(list)
     for arc_id, (u, v) in enumerate(arcs):
         graph[int(u)].append((int(v), int(arc_id)))
@@ -91,6 +112,7 @@ def load_trip_data(trip_dir: Path) -> TripMeta:
     return TripMeta(
         trip_id=tid,
         trip_dir=trip_dir,
+        track_raw=track,
         track_lonlat=track_lonlat,
         track_time=track_time,
         track_xy=track_xy,
@@ -99,7 +121,9 @@ def load_trip_data(trip_dir: Path) -> TripMeta:
         arcs=arcs,
         arc_midpoints_xy=arc_midpoints_xy,
         spatial_index=spatial_index,
+        network=net,
         graph=dict(graph),
+        epsg=epsg,
         n_points=len(track),
         n_nodes=len(nodes),
         n_arcs=len(arcs),
