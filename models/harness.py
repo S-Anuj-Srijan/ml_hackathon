@@ -5,7 +5,7 @@ Expected feature table (parquet/csv) from Member A, one row per (observation, ca
   split in {"train", "student"}, plus numeric feature columns.
 Evaluator trips must NEVER be in this table.
 """
-import json, time, random
+import json, time, random, os
 import numpy as np, pandas as pd
 from sklearn.model_selection import GroupKFold
 from sklearn.metrics import f1_score, log_loss, precision_score, recall_score, confusion_matrix
@@ -20,8 +20,12 @@ def seed_all(seed=SEED):
     random.seed(seed); np.random.seed(seed)
 
 
+# Features to leave out of every run, set once per CMD window:  set PATHSNAP_DROP_FEATURES=offset_m,from_degree,to_degree
+DROP = [c for c in os.environ.get("PATHSNAP_DROP_FEATURES", "").split(",") if c]
+
+
 def feature_cols(df):
-    return [c for c in df.columns if c not in ID_COLS]
+    return [c for c in df.columns if c not in ID_COLS and c not in DROP]
 
 
 def obs_metrics(df, proba):
