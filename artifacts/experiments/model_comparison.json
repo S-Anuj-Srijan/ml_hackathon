@@ -26,7 +26,8 @@
     "student_miss_rate": 0.0,
     "student_top1_given_hit": 0.7989039665970773,
     "student_train_time_s": 10.348616700000093,
-    "student_inference_ms_per_1k_cands": 0.18913839236665186
+    "student_inference_ms_per_1k_cands": 0.18913839236665186,
+    "student_route_continuity": 0.8927415143603133
   },
   "GaussianNB": {
     "family": "Probabilistic",
@@ -55,7 +56,8 @@
     "student_miss_rate": 0.0,
     "student_top1_given_hit": 0.5761482254697285,
     "student_train_time_s": 1.2991234999999506,
-    "student_inference_ms_per_1k_cands": 0.5596002495254764
+    "student_inference_ms_per_1k_cands": 0.5596002495254764,
+    "student_route_continuity": 0.8654830287206267
   },
   "DecisionTree": {
     "family": "Tree",
@@ -84,7 +86,8 @@
     "student_miss_rate": 0.0,
     "student_top1_given_hit": 0.8138308977035491,
     "student_train_time_s": 161.8941402999999,
-    "student_inference_ms_per_1k_cands": 0.1865597683650767
+    "student_inference_ms_per_1k_cands": 0.1865597683650767,
+    "student_route_continuity": 0.8985900783289817
   },
   "ExtraTrees": {
     "family": "Ensemble",
@@ -113,7 +116,8 @@
     "student_miss_rate": 0.0,
     "student_top1_given_hit": 0.8095511482254697,
     "student_train_time_s": 93.83274900000015,
-    "student_inference_ms_per_1k_cands": 3.021161391064494
+    "student_inference_ms_per_1k_cands": 3.021161391064494,
+    "student_route_continuity": 0.895509138381201
   },
   "HistGB": {
     "family": "Boosting",
@@ -142,6 +146,7 @@
     "student_miss_rate": 0.0,
     "student_top1_given_hit": 0.7833507306889352,
     "student_train_time_s": 62.86724689999983,
-    "student_inference_ms_per_1k_cands": 5.2126779240758125
+    "student_inference_ms_per_1k_cands": 5.2126779240758125,
+    "student_route_continuity": 0.844177545691906
   }
 }

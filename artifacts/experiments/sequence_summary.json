@@ -1,0 +1,12 @@
+{
+  "trips": 10,
+  "observations": 19160,
+  "classifier_top1": 0.8127348643006264,
+  "classifier_continuity": 0.9013577023498694,
+  "classifier_route_jaccard": 0.6734074556341635,
+  "classifier_exact_sequence": 0.0,
+  "hmm_top1": 0.8428496868475992,
+  "hmm_continuity": 0.960313315926893,
+  "hmm_route_jaccard": 0.7681040717733574,
+  "hmm_exact_sequence": 0.0
+}
