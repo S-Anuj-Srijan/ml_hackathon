@@ -4,9 +4,23 @@ __pycache__/
 smoke_results/
 data/raw/
 .deps*/
-__pycache__/
 .pytest_cache/
 Student folder/
 PathSnap_student_materials/
+src/
 *.tmp
 build-data.log
+*.bak
+
+# Models
+models/best_model.joblib
+
+# IDE & OS
+.vscode/
+.idea/
+*.swp
+Thumbs.db
+.DS_Store
+
+# Results
+results/
