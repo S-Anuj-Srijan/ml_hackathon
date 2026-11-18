@@ -1,0 +1,12 @@
+
+PathSnap backend - leave this terminal running
+Readiness: http://localhost:8010/ready
+API docs:  http://localhost:8010/docs
+On Laptop 2: open frontend/index.html, then enter one of these API URLs:
+  http://10.8.120.249:8010
+  http://100.105.186.37:8010
+  http://192.168.137.1:8010
+  http://192.168.56.1:8010
+Optional local UI: http://localhost:8010/ui/
+INFO:     127.0.0.1:49672 - "GET /ready HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49672 - "POST /predict/00000007 HTTP/1.1" 200 OK

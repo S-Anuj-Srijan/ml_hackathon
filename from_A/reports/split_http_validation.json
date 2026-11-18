@@ -1,0 +1,8 @@
+{
+    "status":  200,
+    "allow_origin":  "*",
+    "trip":  "00000007",
+    "observations":  1354,
+    "milliseconds":  4596.8,
+    "model_version":  "HistGB-8623248d7844"
+}

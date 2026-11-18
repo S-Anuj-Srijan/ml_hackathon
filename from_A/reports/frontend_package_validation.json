@@ -1,0 +1,7 @@
+{
+  "archive": "PathSnap-frontend.zip",
+  "sha256": "44adbd2a4c6e8114f1a6b632e11bb7d499cca387054cebb1d882d352dd9c8da6",
+  "files_verified": 16,
+  "all_passed": true,
+  "scope": "ZIP extracted independently and every asset fetched over local HTTP; no physical second laptop/browser test"
+}

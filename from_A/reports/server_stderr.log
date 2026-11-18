@@ -1,0 +1,7 @@
+C:\Users\text2\Desktop\ml_lab\ml_hackathon\.runtime\pandas\core\arrays\masked.py:63: UserWarning: Pandas requires version '1.5.0' or newer of 'bottleneck' (version '1.4.2' currently installed).
+  from pandas.core import (
+INFO:     Started server process [5484]
+INFO:     Waiting for application startup.
+{"event": "ready", "trips": 10, "model_version": "HistGB-8623248d7844"}
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
