@@ -8,10 +8,10 @@
 
 | Member | Owns | Deliverable |
 |:------:|:-----|:------------|
-| **A** | Data loading, EDA, Folium maps, candidate generation, features | `features.parquet` to B and C |
-| **B** | Model zoo, CV harness, comparison plots, Optuna | Saved model and probabilities to C and D |
-| **C** | Road-graph connectivity, HMM/Viterbi, route continuity metric | Decoder module to D |
-| **D** | Repo structure, FastAPI, UI, two-laptop setup, README | Working end-to-end skeleton |
+| **Anuj** | Data loading, EDA, Folium maps, candidate generation, features | `features.parquet` to B and C |
+| **Ryona** | Model zoo, CV harness, comparison plots, Optuna | Saved model and probabilities to C and D |
+| **Rufus** | Road-graph connectivity, HMM/Viterbi, route continuity metric | Decoder module to D |
+| **Haritej** | Repo structure, FastAPI, UI, two-laptop setup, README | Working end-to-end skeleton |
 
 ---
 
